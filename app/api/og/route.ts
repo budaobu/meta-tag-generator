@@ -45,12 +45,17 @@ export async function POST(req: NextRequest) {
       },
     )
 
-    return new NextResponse(await imageData.arrayBuffer(), {
-      headers: {
-        'Content-Type': 'image/png',
-        'Cache-Control': 'public, max-age=31536000, immutable',
-      },
-    })
+    // Convert the image to a Blob
+    const blob = await imageData.blob()
+
+    // Convert Blob to Base64
+    const arrayBuffer = await blob.arrayBuffer()
+    const base64Image = Buffer.from(arrayBuffer).toString('base64')
+
+    // Create a data URL
+    const dataUrl = `data:image/png;base64,${base64Image}`
+
+    return NextResponse.json({ url: dataUrl })
   } catch (e) {
     console.error('Error in OG image generation:', e)
     return NextResponse.json(

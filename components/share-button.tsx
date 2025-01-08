@@ -32,16 +32,17 @@ export function ShareButton() {
         body: JSON.stringify({ url: currentUrl }),
       })
 
+      const responseData = await response.json()
+
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(`Failed to generate image: ${JSON.stringify(errorData)}`)
+        throw new Error(responseData.error || 'Failed to generate image')
       }
 
-      const data = await response.json()
-      if (!data.url) {
+      if (!responseData.url) {
         throw new Error('No URL returned from the API')
       }
-      setShareUrl(data.url)
+
+      setShareUrl(responseData.url)
       setIsOpen(true)
     } catch (error) {
       console.error('Error generating share image:', error)
