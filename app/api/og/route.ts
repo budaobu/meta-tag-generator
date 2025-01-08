@@ -1,8 +1,8 @@
 import { ImageResponse } from 'next/server'
 import { NextRequest, NextResponse } from 'next/server'
- 
+
 export const runtime = 'edge'
- 
+
 export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json()
@@ -12,9 +12,10 @@ export async function POST(req: NextRequest) {
     }
 
     const imageData = new ImageResponse(
-      (
-        <div
-          style={{
+      {
+        type: 'div',
+        props: {
+          style: {
             height: '100%',
             width: '100%',
             display: 'flex',
@@ -24,35 +25,36 @@ export async function POST(req: NextRequest) {
             backgroundColor: 'white',
             fontSize: 32,
             fontWeight: 600,
-          }}
-        >
-          <div style={{ marginBottom: 24 }}>
-            Meta Tag Generator
-          </div>
-          <div
-            style={{
-              fontSize: 24,
-              fontWeight: 400,
-            }}
-          >
-            {url}
-          </div>
-        </div>
-      ),
+          },
+          children: [
+            {
+              type: 'div',
+              props: {
+                style: { marginBottom: 24 },
+                children: 'Meta Tag Generator',
+              },
+            },
+            {
+              type: 'div',
+              props: {
+                style: {
+                  fontSize: 24,
+                  fontWeight: 400,
+                },
+                children: url,
+              },
+            },
+          ],
+        },
+      },
       {
         width: 1200,
         height: 630,
-      },
+      }
     )
 
-    // Convert the image to a Blob
-    const blob = await imageData.blob()
-
-    // Convert Blob to Base64
-    const arrayBuffer = await blob.arrayBuffer()
+    const arrayBuffer = await imageData.arrayBuffer()
     const base64Image = Buffer.from(arrayBuffer).toString('base64')
-
-    // Create a data URL
     const dataUrl = `data:image/png;base64,${base64Image}`
 
     return NextResponse.json({ url: dataUrl })
